@@ -3,9 +3,7 @@ import boto3
 import uuid
 
 client = boto3.client(
-    's3',
-    aws_access_key_id="AKIARVYAQ4UKQFZXXHHE",
-    aws_secret_access_key="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",
+    's3'
 )
 
 picture = st.camera_input("Take a picture")
