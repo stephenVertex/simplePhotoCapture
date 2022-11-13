@@ -112,6 +112,8 @@ def getPhotoInfo(new_key = None):
 if picture:
     ukey = str(uuid.uuid4())
     ## TODO parameterize the "flowers" part somehow
+    ## This is where we decide where to put it
+    ## We can make a folder called GENERAL which has this.
     s3key = "rekognition/flowers/" + ukey + ".jpg"
     fname = "/tmp/" + ukey + ".jpg"
     ## Write image to temp file
