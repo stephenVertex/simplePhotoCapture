@@ -6,21 +6,29 @@ from collections import OrderedDict
 import os
 import json
 import pandas as pd
+import re
 client = boto3.client(
     's3'
 )
 
+## The main interface. 
+## Prompt for taking a picture
 picture = st.camera_input("Take a picture")
-s3bucket = "sales-calls-df-demo"
-
+s3bucket = "geneva-devflows-2022-demo"
 st.write(f"Take a picture!")
 
+## If given an input photo name
+##    A) new_key = "input/thing.image"
+##    B) Once the analysis runs, then we expect to also have
+##       nk2 = new_key + "--label-data.json"
+##    C) If we have new_key and nk2 then proceed
+##    D) Download
 def getPhotoInfo(new_key = None):
 
     session = boto3.Session()
 
-    s3bucket = "sales-calls-df-demo"
-    prefix = "inboundimageslabelling/"
+    s3bucket = "geneva-devflows-2022-demo"
+    prefix = "rekognition/"
 
     s3 = session.resource('s3')
     my_bucket = s3.Bucket(s3bucket)
@@ -31,11 +39,17 @@ def getPhotoInfo(new_key = None):
         object_list.append(i)
 
     ## Sort them by last modified
+    ## DONE here would be a good place to search for the "*--label-data.json" extension
     sorted_objects = sorted(object_list, key= lambda x: x.last_modified, reverse=True)
-    top5 = sorted_objects[0:5]
+    s2 = list( filter(lambda x: re.match(".*--label-data.json$", x.key), sorted_objects)   )
+    top5 = s2[0:5]
 
     if new_key is not None:
-        nk2 = new_key.replace(".jpg", ".json").replace("inboundimages", "inboundimageslabelling")
+        ## DONE Need to fix this, as we now have them in the same bucket
+        ## it should be something like
+        nk2 = new_key + "--label-data.json"
+
+        ## TODO Add the check for the new lmage as well
         key_list = [x.key for x in top5]
         print(f"Looking for {nk2} in {key_list}")
         if nk2 not in key_list:
@@ -53,20 +67,26 @@ def getPhotoInfo(new_key = None):
         with open(fname, "r") as f:
             labels[t.key] = json.loads(f.read())
 
-
     ## Get the labels
     namesInPic = OrderedDict()
     for k,v in labels.items():
-        names = [x['Name'] for x in v['Labels']]
-        print(names)
+        if 'Labels' in v.keys():
+            names = [x['Name'] for x in v['Labels']]
+            print(names)
+        elif 'Name' in v.keys():
+            names = [v['Name']]
+        else:
+            names = ["No name"]
         namesInPic[k] = names
 
     ## Generate the URLS
     picUrls = OrderedDict()
     for t in top5:
         k = t.key
-        imgid = os.path.splitext(os.path.split(k)[1])[0]
-        imgurl = f"https://sales-calls-df-demo.s3.amazonaws.com/inboundimages/{imgid}.jpg"
+        ## TODO Fix the image url generator by stripping "--label-data.json"
+        ## and then adding the right thing
+        imgid = k.replace("--label-data.json", "")
+        imgurl = f"https://{s3bucket}.s3.amazonaws.com/" + imgid
         picUrls[k] = imgurl
 
     def newLineList(x):
@@ -91,7 +111,8 @@ def getPhotoInfo(new_key = None):
 
 if picture:
     ukey = str(uuid.uuid4())
-    s3key = "inboundimages/" + ukey + ".jpg"
+    ## TODO parameterize the "flowers" part somehow
+    s3key = "rekognition/flowers/" + ukey + ".jpg"
     fname = "/tmp/" + ukey + ".jpg"
     ## Write image to temp file
     f = open(fname, 'wb')
