@@ -70,7 +70,11 @@ def getPhotoInfo(new_key = None):
     ## Get the labels
     namesInPic = OrderedDict()
     for k,v in labels.items():
-        if 'Labels' in v.keys():
+        if type(v) == list:
+            ## This is an error case in which I accidently 
+            ## pass in the inner object
+            names = [x['Name'] for x in v]
+        elif 'Labels' in v.keys():
             names = [x['Name'] for x in v['Labels']]
             print(names)
         elif 'Name' in v.keys():
@@ -131,7 +135,7 @@ if picture:
     ## Sleep for 5 seconds to give the thing time
     r = getPhotoInfo(s3key)
     tries = 0
-    while(r is False and tries < 20):
+    while(r is False and tries < 100):
         print(f"{tries} : We don't have it yet. Sleeping")
         time.sleep(1)
         r = getPhotoInfo(s3key)
