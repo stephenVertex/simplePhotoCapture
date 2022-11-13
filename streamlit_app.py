@@ -114,7 +114,7 @@ if picture:
     ## TODO parameterize the "flowers" part somehow
     ## This is where we decide where to put it
     ## We can make a folder called GENERAL which has this.
-    s3key = "rekognition/flowers/" + ukey + ".jpg"
+    s3key = "rekognition/general/" + ukey + ".jpg"
     fname = "/tmp/" + ukey + ".jpg"
     ## Write image to temp file
     f = open(fname, 'wb')
