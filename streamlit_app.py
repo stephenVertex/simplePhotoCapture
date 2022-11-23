@@ -43,7 +43,14 @@ client = boto3.client(
 picture = st.camera_input("Take a picture")
 s3bucket = "geneva-devflows-2022-demo"
 st.write(f"Take a picture")
-
+st.write(f"Or, upload one")
+uploaded_file = st.file_uploader(
+    label="Upload an image", 
+    type=['.png', '.jpg', '.jpeg'], 
+    accept_multiple_files=False, 
+    key=None, help=None, 
+    on_change=None,
+    label_visibility="visible")
 
 ## If given an input photo name
 ##    A) new_key = "input/thing.image"
@@ -58,7 +65,7 @@ def getPhotoInfo(new_key = None):
     s3bucket = "geneva-devflows-2022-demo"
     prefix = "rekognition/general/" + cookies[cookie]
 
-    st.write(f"{prefix=}")
+    #st.write(f"{prefix=}")
 
     s3 = session.resource('s3')
     my_bucket = s3.Bucket(s3bucket)
@@ -71,7 +78,7 @@ def getPhotoInfo(new_key = None):
     ## Sort them by last modified
     ## DONE here would be a good place to search for the "*--label-data.json" extension
     sorted_objects = sorted(object_list, key= lambda x: x.last_modified, reverse=True)
-    s2 = list( filter(lambda x: re.match(".*--label-data.json$", x.key), sorted_objects)   )
+    s2 = list( filter(lambda x: re.match(".*--label-data.json$", x.key), sorted_objects)   )    
     top5 = s2[0:5]
 
     if new_key is not None:
@@ -131,7 +138,7 @@ def getPhotoInfo(new_key = None):
 
     df = pd.DataFrame({
         'time'   : [str(x.last_modified) for x in top5],
-        #'labels' : [str(x) for x in namesInPic.values()],
+        #'labels' : [str(uploaded_file = st.file_uploader("Choose a file")
         #'labels' : [str(x) for x in list(namesInPic.values())],
         'labels' : [newLineList(x) for x in list(namesInPic.values())],
         #'url'    : list(picUrls.values())
@@ -171,6 +178,31 @@ if picture:
         r = getPhotoInfo(s3key)
         print(f"\t{r}")
         tries = tries + 1
-    
+
+elif uploaded_file:
+    ukey = str(uuid.uuid4())
+    s3key = "rekognition/general/" + cookies[cookie] + "/" + ukey + ".jpg"
+    fname = "/tmp/" + ukey + ".jpg"
+    ## Write image to temp file
+    f = open(fname, 'wb')
+    f.write(uploaded_file.getvalue())
+    f.close()
+
+    ## Show the user, and tell them what happened
+    st.image(uploaded_file)
+
+    ## Upload the file
+    client.upload_file(fname, s3bucket, s3key)
+    st.write(f"Uploaded {s3key} to {s3bucket}")
+
+    ## Sleep for 5 seconds to give the thing time
+    r = getPhotoInfo(s3key)
+    tries = 0
+    while(r is False and tries < 100):
+        print(f"{tries} : We don't have it yet. Sleeping")
+        time.sleep(1)
+        r = getPhotoInfo(s3key)
+        print(f"\t{r}")
+        tries = tries + 1
 else:
     getPhotoInfo()
