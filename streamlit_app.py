@@ -106,7 +106,9 @@ def getPhotoInfo(new_key = None):
 
     ## Get the labels
     namesInPic = OrderedDict()
+    taggedUrls = OrderedDict()
     for k,v in labels.items():
+        print(v)
         if type(v) == list:
             ## This is an error case in which I accidently 
             ## pass in the inner object
@@ -119,6 +121,11 @@ def getPhotoInfo(new_key = None):
         else:
             names = ["No name"]
         namesInPic[k] = names
+
+        if 'bounded_image' in v.keys():
+            taggedUrls[k] = v['bounded_image']
+        else:
+            taggedUrls[k] = "Error"
 
     ## Generate the URLS
     picUrls = OrderedDict()
@@ -142,7 +149,8 @@ def getPhotoInfo(new_key = None):
         #'labels' : [str(x) for x in list(namesInPic.values())],
         'labels' : [newLineList(x) for x in list(namesInPic.values())],
         #'url'    : list(picUrls.values())
-        'url'    : [mkImageTag(x) for x in picUrls.values()]
+        'url'    : [mkImageTag(x) for x in picUrls.values()],
+        't_url'  : [mkImageTag(x) for x in taggedUrls.values()]
     })
 
     print(df)
