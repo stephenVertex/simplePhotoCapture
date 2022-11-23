@@ -1,0 +1,13 @@
+# List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
+tasks:
+  - init: |
+      pip3 install -r requirements.txt
+      aws configure --profile devgraph set aws_access_key_id $AWS_ACCESS_KEY_ID
+      aws configure --profile devgraph set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+      aws configure --profile devgraph set aws_default_region $AWS_DEFAULT_REGION
+
+    command: echo 'start script'
+# List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
+ports:
+  - port: 3000
+    onOpen: open-preview
