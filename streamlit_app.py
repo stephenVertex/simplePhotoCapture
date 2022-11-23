@@ -102,23 +102,29 @@ def getPhotoInfo(new_key = None):
         my_bucket.download_file(t.key, fname)
         print("...DONE")
         with open(fname, "r") as f:
-            labels[t.key] = json.loads(f.read())
+            labels[t.key] = json.loads(f.read())['label_data']
+
+    st.write(f"DEBUG: labels - {labels}")
 
     ## Get the labels
     namesInPic = OrderedDict()
+    #scoresInPic = OrderedDict()
     for k,v in labels.items():
         if type(v) == list:
             ## This is an error case in which I accidently 
             ## pass in the inner object
-            names = [x['Name'] for x in v]
-        elif 'Labels' in v.keys():
-            names = [x['Name'] for x in v['Labels']]
-            print(names)
-        elif 'Name' in v.keys():
-            names = [v['Name']]
+            names = [f"{x['Name']}, {x['Score']:.2f}" for x in v]
+            #scores = [x['Score'] for x in v]
+        #elif 'Labels' in v.keys():
+        #    names = [x['Name'] for x in v['Labels']]
+        #    print(names)
+        #elif 'Name' in v.keys():
+        #    names = [v['Name']]
         else:
-            names = ["No name"]
+            names = ["No names"]
+            scores = ["No scores"]
         namesInPic[k] = names
+        #scoresInPic[k] = scores
 
     ## Generate the URLS
     picUrls = OrderedDict()
@@ -141,6 +147,7 @@ def getPhotoInfo(new_key = None):
         #'labels' : [str(uploaded_file = st.file_uploader("Choose a file")
         #'labels' : [str(x) for x in list(namesInPic.values())],
         'labels' : [newLineList(x) for x in list(namesInPic.values())],
+        #'confidence' : [newLineList(str(x)) for x in list(scoresInPic.values())],
         #'url'    : list(picUrls.values())
         'url'    : [mkImageTag(x) for x in picUrls.values()]
     })
