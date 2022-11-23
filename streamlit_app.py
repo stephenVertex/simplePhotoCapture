@@ -94,6 +94,7 @@ def getPhotoInfo(new_key = None):
 
     ## Download the json files if we don't have them already
     labels = OrderedDict()
+    namesdict = OrderedDict()
     for t in top5:
         fname = "/tmp/" + t.key
         print(fname)
@@ -102,29 +103,37 @@ def getPhotoInfo(new_key = None):
         my_bucket.download_file(t.key, fname)
         print("...DONE")
         with open(fname, "r") as f:
-            labels[t.key] = json.loads(f.read())['label_data']
+            labels[t.key] = json.loads(f.read()) #['label_data']
+            namesdict[t.key] = labels[t.key]['label_data']
 
-    st.write(f"DEBUG: labels - {labels}")
+    #st.write(f"DEBUG: labels - {labels}")
 
     ## Get the labels
     namesInPic = OrderedDict()
+    for k,v in namesdict.items():
+        try:
+            names = [f"{x['Name']}, {x['Score']:.2f}" for x in v]
+        except TypeError as e:
+            raise TypeError(f"ERROR: parsing name and scores from {v}") from e
+        namesInPic[k]=names
+
     taggedUrls = OrderedDict()
     for k,v in labels.items():
-        print(v)
-        if type(v) == list:
-            ## This is an error case in which I accidently 
+        #print(v)
+        #if type(v) == list:
+            ## This is an error case in which I accidently
             ## pass in the inner object
-            names = [f"{x['Name']}, {x['Score']:.2f}" for x in v]
+            #names = [f"{x['Name']}, {x['Score']:.2f}" for x in v]
             #scores = [x['Score'] for x in v]
         #elif 'Labels' in v.keys():
         #    names = [x['Name'] for x in v['Labels']]
         #    print(names)
         #elif 'Name' in v.keys():
         #    names = [v['Name']]
-        else:
-            names = ["No names"]
-            scores = ["No scores"]
-        namesInPic[k] = names
+        #else:
+        #    names = ["No names"]
+            #scores = ["No scores"]
+        #namesInPic[k] = names
         #scoresInPic[k] = scores
 
         if 'bounded_image' in v.keys():
