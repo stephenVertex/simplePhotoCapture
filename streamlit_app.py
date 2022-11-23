@@ -149,8 +149,8 @@ def getPhotoInfo(new_key = None):
         #'labels' : [str(x) for x in list(namesInPic.values())],
         'labels' : [newLineList(x) for x in list(namesInPic.values())],
         #'url'    : list(picUrls.values())
-        'url'    : [mkImageTag(x) for x in picUrls.values()],
-        't_url'  : [mkImageTag(x) for x in taggedUrls.values()]
+        'Image'    : [mkImageTag(x) for x in picUrls.values()],
+        'Labeled Image'  : [mkImageTag(x) for x in taggedUrls.values()]
     })
 
     print(df)
