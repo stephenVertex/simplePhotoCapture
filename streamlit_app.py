@@ -15,8 +15,8 @@ client = boto3.client(
 ## Prompt for taking a picture
 picture = st.camera_input("Take a picture")
 s3bucket = "geneva-devflows-2022-demo"
-st.write(f"Take a picture!")
-st.write(st.session_state)
+st.write(f"Take a picture")
+
 
 ## If given an input photo name
 ##    A) new_key = "input/thing.image"
@@ -69,9 +69,9 @@ def getPhotoInfo(new_key = None):
             labels[t.key] = json.loads(f.read())
 
     ## Get the labels
-    namesInPic = OrderedDict()https://geneva-devflows-2022-demo.s3.amazonaws.com/
-    for k,v in labels.items():https://geneva-devflows-2022-demo.s3.amazonaws.com/
-        if type(v) == list:https://geneva-devflows-2022-demo.s3.amazonaws.com/
+    namesInPic = OrderedDict()
+    for k,v in labels.items():
+        if type(v) == list:
             ## This is an error case in which I accidently 
             ## pass in the inner object
             names = [x['Name'] for x in v]
