@@ -5,6 +5,8 @@ tasks:
       aws configure --profile devgraph set aws_access_key_id $AWS_ACCESS_KEY_ID
       aws configure --profile devgraph set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
       aws configure --profile devgraph set aws_default_region $AWS_DEFAULT_REGION
+      pyenv install 3.9-dev
+      pyenv global 3.9-dev
 
     command: echo 'start script'
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
