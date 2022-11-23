@@ -56,7 +56,9 @@ def getPhotoInfo(new_key = None):
     session = boto3.Session()
 
     s3bucket = "geneva-devflows-2022-demo"
-    prefix = "rekognition/"
+    prefix = "rekognition/general/" + cookies[cookie]
+
+    st.write(f"{prefix=}")
 
     s3 = session.resource('s3')
     my_bucket = s3.Bucket(s3bucket)
@@ -146,7 +148,7 @@ if picture:
     ## TODO parameterize the "flowers" part somehow
     ## This is where we decide where to put it
     ## We can make a folder called GENERAL which has this.
-    s3key = "rekognition/general/" + ukey + ".jpg"
+    s3key = "rekognition/general/" + cookies[cookie] + "/" + ukey + ".jpg"
     fname = "/tmp/" + ukey + ".jpg"
     ## Write image to temp file
     f = open(fname, 'wb')
