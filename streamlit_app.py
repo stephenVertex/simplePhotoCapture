@@ -95,12 +95,14 @@ def getPhotoInfo(new_key = None):
     ## Download the json files if we don't have them already
     labels = OrderedDict()
     namesdict = OrderedDict()
+    json_urls = []
     for t in top5:
         fname = "/tmp/" + t.key
         print(fname)
         base = os.path.split(t.key)[0]
         os.makedirs(os.path.join("/tmp" ,base), exist_ok=True)
         my_bucket.download_file(t.key, fname)
+        json_urls.append(f"https://{s3bucket}.s3.amazonaws.com/" + t.key)
         print("...DONE")
         with open(fname, "r") as f:
             labels[t.key] = json.loads(f.read()) #['label_data']
@@ -165,7 +167,8 @@ def getPhotoInfo(new_key = None):
         #'confidence' : [newLineList(str(x)) for x in list(scoresInPic.values())],
         #'url'    : list(picUrls.values())
         #'Image'    : [mkImageTag(x) for x in picUrls.values()],
-        'Labeled Image'  : [mkImageTag(x) for x in taggedUrls.values()]
+        'Labeled Image'  : [mkImageTag(x) for x in taggedUrls.values()],
+        'JSON' : [str(x) for x in json_urls]
     })
 
     print(df)
