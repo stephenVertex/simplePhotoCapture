@@ -164,7 +164,7 @@ def getPhotoInfo(new_key = None):
         'labels' : [newLineList(x) for x in list(namesInPic.values())],
         #'confidence' : [newLineList(str(x)) for x in list(scoresInPic.values())],
         #'url'    : list(picUrls.values())
-        'Image'    : [mkImageTag(x) for x in picUrls.values()],
+        #'Image'    : [mkImageTag(x) for x in picUrls.values()],
         'Labeled Image'  : [mkImageTag(x) for x in taggedUrls.values()]
     })
 
